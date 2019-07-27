@@ -4,12 +4,27 @@ import json
 
 
 def clean_title(movie):
-    non_title_chars = re.compile(r'(.+?)(?:.m4v.+| \(\d{1,4}p HD\).+| \(HD\).+)')
 
-    movie_title = non_title_chars.match(movie)
+    unformatted_title = re.match(r'(.+?)(?:.m4v.+| \(\d{1,4}p HD\).+| \(HD\).+)', movie)
 
-    if movie_title:
-        return movie_title.group(1).replace("_",":")
+    if unformatted_title:
+        return unformatted_title.group(1).replace("_", ":")
+
+
+def input_reader(command):
+    if command == 'X':
+        return "Exiting..."
+
+
+class UserCommand:
+
+    def __init__(self, command, flag1, flag2):
+        self.command = command
+        self.flag1 = flag1
+        self.flag2 = flag2
+
+
+
 
 # titles = """Her Smell (1080p HD).m4v	2019-07-11 13:45 	2.8G
 # Gloria Bell (1080p HD).m4v	2019-07-11 13:43 	1.6G
@@ -33,9 +48,10 @@ api_url = 'http://www.omdbapi.com/?apikey=f2caa646&t='.encode()
 
 while True:
 
-    titles = input("""First things first, you have to load movies into the program.
-                    Copy and paste entire lines below and press Enter.
-                    Press X to exit.\n""")
+    titles = input("""
+    First things first, you have to load movies into the program.
+    Copy and paste entire lines below and press Enter.
+    Press X to exit.\n""")
 
     if titles.strip().upper() == 'X':
         print('Exiting...')
@@ -68,12 +84,7 @@ while True:
 
     print('To see Rotten Tomatoes rating, type [title] -r -rt.  For more, type -help.  To exit, type X.\n')
 
-    command = input().strip().upper()
-
-    if command == 'X':
-        print('Exiting...')
-        break
-    elif command == '-help':
-        pass
-    elif command == '':
-        pass
+    _ = input().upper().strip()
+    _ = re.match(r"([\w\W\d]+?) (-\w{1,4}) (-\w{1,4})", _)
+    command = UserCommand(_.group(1), _.group(2), _.group(3))
+    input()
