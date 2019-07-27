@@ -2,6 +2,25 @@ import re
 import requests as r
 import json
 
+def print_dict_pairs_neat(dict, print_name):
+
+    print('Printing {}...'.format(print_name))
+
+    for k, v in dict.items():
+        print('\t', k.title(), ':', v)
+
+
+def print_ratings(dict):
+
+    print('Printing ratings...')
+
+    for k, v in dict.items():
+        print('\t', '{} gave it {}'.format(k, v))
+
+
+def parse_user_input(uinput):
+
+    return re.match(r"([\w\W\d]+?) (-\w{1,4}) (-\w{1,4})", uinput)
 
 class Movie:
 
@@ -39,7 +58,7 @@ class Movie:
 
     def get_all_data(self):
 
-        return self.__dict__.items()
+        return self.__dict__
 
     def get_production_data(self):
 
@@ -52,6 +71,7 @@ class Movie:
         }
 
         return production_dict
+
 
     def get_metadata(self):
 
@@ -75,54 +95,29 @@ movie_dict = {'Her Smell':{"Title":"Her Smell","Year":"2018","Rated":"R","Releas
 
 print('\nMovies loaded.\n')
 
-
 '''parse the user input'''
-_ = "Gloria Bell -r -all"
-_ = re.match(r"([\w\W\d]+?) (-\w{1,4}) (-\w{1,4})", _)
-
+uinput = 'After -r -all'
+command = parse_user_input(uinput)
 
 '''grab movie from the user input'''
-movie = _.group(1)
 
-if movie in movie_dict:
-    command = Movie(movie, movie_dict)
+if command.group(1) in movie_dict:
+    movie = Movie(command.group(1), movie_dict)
 else:
-    command = AltCommand(command)
+    #process_command(command.group(1))
 
 '''if flag = -r then...'''
 
-ratings = command.get_ratings()
-
-print('Printing ratings...')
-
-for k, v in ratings.items():
-
-    print('\t{} gave it {}'.format(k, v))
+print_ratings(command.get_ratings())
 
 '''if flag = -a then...'''
 
-print('Printing all data...')
-
-for k, v in command.get_all_data():
-
-    print('\t', k.title(), ':', v)
+print_dict_pairs_neat(command.get_all_data(),'all data')
 
 '''if flag = -p then...'''
 
-production_data = command.get_production_data()
-
-print('Printing production data...')
-
-for k, v in production_data.items():
-
-    print('\t', k.title(), ':', v)
+print_dict_pairs_neat(command.get_production_data(),'production data')
 
 '''if flag = -m then...'''
 
-metadata = command.get_metadata()
-
-print('Printing metadata...')
-
-for k, v in metadata.items():
-
-    print('\t', k.title(), ':', v)
+print_dict_pairs_neat(command.get_metadata(),'metadata')
