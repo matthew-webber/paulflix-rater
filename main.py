@@ -23,21 +23,19 @@ class UserCommand:
         self.flag1 = flag1
         self.flag2 = flag2
 
+    def get_ratings(self, movie_dict):
+        if self.flag2 == '-rt':
+            pass
 
 
 
-# titles = """Her Smell (1080p HD).m4v	2019-07-11 13:45 	2.8G
-# Gloria Bell (1080p HD).m4v	2019-07-11 13:43 	1.6G
-# After (HD).m4v	2019-07-10 15:10 	915M
-# Through Black Spruce (1080p HD).m4v	2019-07-10 14:50 	1.8G
-# Paper Year (1080p HD).m4v	2019-07-10 14:49 	1.4G
-# Missing Link (1080p HD).m4v	2019-07-10 14:48 	1.5G
-# Hellboy (1080p HD).m4v	2019-07-10 14:48 	2.0G
-# Teen Spirit (HD).m4v	2019-07-06 11:25 	1.5G
-# Alita_ Battle Angel (1080p HD).m4v	2019-06-29 15:52 	2.0G
-# The Bits of Yesterday (1080p HD).m4v	2019-06-29 15:52 	1.7G
-# Shaft (1080p HD).m4v	2019-06-29 15:51 	1.8G
-# Making Babies (1080p HD).m4v	2019-06-29 15:51 	1.4G"""
+
+
+
+
+titles = """Her Smell (1080p HD).m4v	2019-07-11 13:45 	2.8G
+Gloria Bell (1080p HD).m4v	2019-07-11 13:43 	1.6G
+After (HD).m4v	2019-07-10 15:10 	915M"""
 
 #clean_titles = [clean_title(x) for x in titles.split('\n')]
 
@@ -48,10 +46,10 @@ api_url = 'http://www.omdbapi.com/?apikey=f2caa646&t='.encode()
 
 while True:
 
-    titles = input("""
-    First things first, you have to load movies into the program.
-    Copy and paste entire lines below and press Enter.
-    Press X to exit.\n""")
+    # titles = input("""
+    # First things first, you have to load movies into the program.
+    # Copy and paste entire lines below and press Enter.
+    # Press X to exit.\n""")
 
     if titles.strip().upper() == 'X':
         print('Exiting...')
@@ -72,7 +70,7 @@ while True:
                 print('Skipping {}...'.format(dirty_title))
                 continue
 
-            movie_data = "Data"
+            movie_data = json.loads("""{}""")
             movie_dict[movie_title] = movie_data
 
     break # move to the next loop
@@ -80,11 +78,9 @@ while True:
 
 print('\nMovies loaded.\n')
 
-while True:
+# print('To see Rotten Tomatoes rating, type [title] -r -rt.  For more, type -help.  To exit, type X.\n')
 
-    print('To see Rotten Tomatoes rating, type [title] -r -rt.  For more, type -help.  To exit, type X.\n')
-
-    _ = input().upper().strip()
-    _ = re.match(r"([\w\W\d]+?) (-\w{1,4}) (-\w{1,4})", _)
-    command = UserCommand(_.group(1), _.group(2), _.group(3))
-    input()
+# _ = input().upper().strip()
+_ = "Her Smell -r -rt"
+_ = re.match(r"([\w\W\d]+?) (-\w{1,4}) (-\w{1,4})", _)
+command = UserCommand(_.group(1), _.group(2), _.group(3))
