@@ -33,7 +33,9 @@ api_url = 'http://www.omdbapi.com/?apikey=f2caa646&t='.encode()
 
 while True:
 
-    titles = input('Copy and paste entire lines below and press Enter.  Press X to exit.\n')
+    titles = input("""First things first, you have to load movies into the program.
+                    Copy and paste entire lines below and press Enter.
+                    Press X to exit.\n""")
 
     if titles.strip().upper() == 'X':
         print('Exiting...')
