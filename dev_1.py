@@ -30,7 +30,7 @@ def print_dict_pairs_neat(dict, print_name):
         print('\t', k.title(), ':', v)
 
 
-def print_ratings(dict, print_name):
+def print_ratings(dict):
 
     print('Printing ratings...')
 
@@ -130,17 +130,18 @@ def flag_process(flag):
 
     flag = flag.replace("-","")
 
-    for flag_lookup in flag_dict:
+    if flag == 'r':
+        print_dict_pairs_neat(movie.get_ratings(), 'ratings')
+    elif flag == 'a':
+        print_dict_pairs_neat(movie.get_all_data(), 'all data')
+    elif flag == 'p':
+        print_dict_pairs_neat(movie.get_production_data(), 'production data')
+    elif flag == 'm':
+        print_dict_pairs_neat(movie.get_metadata(), 'metadata')
 
-        if flag_dict[flag_lookup]['Symbol'] == flag:
-
-            flag_dict[flag_lookup]['Function'](flag_dict[flag_lookup]['Arg1'],flag_dict[flag_lookup]['Arg2'])
-
-# the below gives me a NAME ERROR because movie isn't defined yet
-# I want this to all be in the dictionary and call the arguments from the dict but I odn't know how
 
 flag_dict = {
-    'Flag1': {'Action': "Print movie ratings", 'Function': print_ratings, 'Arg1': movie.get_ratings, 'Arg2': 'placeholder', 'Symbol': 'r'},
+    'Flag1': {'Action': "Print movie ratings", 'Symbol': 'r'},
     'Flag2': {'Action': "Print all movie data", 'Function': "_", 'Symbol': 'a'},
     'Flag3': {'Action': "Print movie production Function", 'Other': "_", 'Symbol': 'p'},
     'Flag4': {'Action': "Print movie metadata", 'Function': "_", 'Symbol': 'm'}}
@@ -185,7 +186,7 @@ print('\nMovies loaded.\n')
 
 
 '''parse the user input'''
-command = 'After -r -all'
+command = 'After -m -all'
 # command = input('Enter [movie] -[flag] and press enter.  Type "help" for more info.\n')
 if command.strip().lower() == 'help':
     print_help()
