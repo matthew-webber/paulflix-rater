@@ -2,39 +2,9 @@ import re
 import requests as r
 import json
 
-flag_dict = {
-    'Flag1': {'Action': "Print movie ratings", 'Other': "_", 'Symbol': 'r'},
-    'Flag2': {'Action': "Print all movie data", 'Other': "_", 'Symbol': 'a'},
-    'Flag3': {'Action': "Print movie production data", 'Other': "_", 'Symbol': 'p'},
-    'Flag4': {'Action': "Print movie metadata", 'Other': "_", 'Symbol': 'm'}}
 
-#todo add way to print out flag dict in help string
-help_plz_kthx = """
-    *** Begin Help File ***
-    
-    General help
-    
-    To do this, type "that" and press enter.
-    To do something else, type "thisthat" and press enter.
-    
-    Flags List
-    
-    -{flag1} :   {flag1_action}
-    -{flag2} :   {flag2_action}
-    -{flag3} :   {flag3_action}
-    -{flag4} :   {flag4_action}
-    
-    *** End Help File ***
-    """.format(
-    flag1 = flag_dict['Flag1']['Symbol'],
-    flag2 = flag_dict['Flag2']['Symbol'],
-    flag3 = flag_dict['Flag3']['Symbol'],
-    flag4 = flag_dict['Flag4']['Symbol'],
-    flag1_action = flag_dict['Flag1']['Action'],
-    flag2_action = flag_dict['Flag2']['Action'],
-    flag3_action = flag_dict['Flag3']['Action'],
-    flag4_action = flag_dict['Flag4']['Action'],
-)
+
+
 
 def flatten_string(string):
 
@@ -60,7 +30,7 @@ def print_dict_pairs_neat(dict, print_name):
         print('\t', k.title(), ':', v)
 
 
-def print_ratings(dict):
+def print_ratings(dict, print_name):
 
     print('Printing ratings...')
 
@@ -145,6 +115,65 @@ class Movie:
         return metadata_dict
 
 
+def flag_process(flag):
+    '''
+    if flag -r print ratings
+    if flag -a print all
+    if flag -p print production data
+    if flag -m print metadata
+    :param flag:
+    :return:
+    '''
+
+    #todo look for "-" to indicate flag
+    # better way to strip flag of minus sign?
+
+    flag = flag.replace("-","")
+
+    for flag_lookup in flag_dict:
+
+        if flag_dict[flag_lookup]['Symbol'] == flag:
+
+            flag_dict[flag_lookup]['Function'](flag_dict[flag_lookup]['Arg1'],flag_dict[flag_lookup]['Arg2'])
+
+# the below gives me a NAME ERROR because movie isn't defined yet
+# I want this to all be in the dictionary and call the arguments from the dict but I odn't know how
+
+flag_dict = {
+    'Flag1': {'Action': "Print movie ratings", 'Function': print_ratings, 'Arg1': movie.get_ratings, 'Arg2': 'placeholder', 'Symbol': 'r'},
+    'Flag2': {'Action': "Print all movie data", 'Function': "_", 'Symbol': 'a'},
+    'Flag3': {'Action': "Print movie production Function", 'Other': "_", 'Symbol': 'p'},
+    'Flag4': {'Action': "Print movie metadata", 'Function': "_", 'Symbol': 'm'}}
+
+help_plz_kthx = """
+    *** Begin Help File ***
+
+    General help
+
+    To do this, type "that" and press enter.
+    To do something else, type "thisthat" and press enter.
+
+    Flags List
+
+    -{flag1} :   {flag1_action}
+    -{flag2} :   {flag2_action}
+    -{flag3} :   {flag3_action}
+    -{flag4} :   {flag4_action}
+
+    *** End Help File ***
+    
+    """.format(
+    flag1=flag_dict['Flag1']['Symbol'],
+    flag2=flag_dict['Flag2']['Symbol'],
+    flag3=flag_dict['Flag3']['Symbol'],
+    flag4=flag_dict['Flag4']['Symbol'],
+    flag1_action=flag_dict['Flag1']['Action'],
+    flag2_action=flag_dict['Flag2']['Action'],
+    flag3_action=flag_dict['Flag3']['Action'],
+    flag4_action=flag_dict['Flag4']['Action'],
+)
+
+
 movie_dict = {'Her Smell':{"Title":"Her Smell","Year":"2018","Rated":"R","Released":"10 May 2019","Runtime":"134 min","Genre":"Drama, Music","Director":"Alex Ross Perry","Writer":"Alex Ross Perry","Actors":"Elisabeth Moss, Angel Christian Roman, Cara Delevingne, Dan Stevens","Plot":"A self-destructive punk rocker struggles with sobriety while trying to recapture the creative inspiration that led her band to success.","Language":"English","Country":"USA, Greece","Awards":"N/A","Poster":"https://m.media-amazon.com/images/M/MV5BMTk2Mzg4NzI3NF5BMl5BanBnXkFtZTgwMzE5NDk1NzM@._V1_SX300.jpg","Ratings":[{"Source":"Internet Movie Database","Value":"6.2/10"},{"Source":"Rotten Tomatoes","Value":"84%"},{"Source":"Metacritic","Value":"69/100"}],"Metascore":"69","imdbRating":"6.2","imdbVotes":"1,219","imdbID":"tt7942742","Type":"movie","DVD":"N/A","BoxOffice":"N/A","Production":"Gunpowder &amp; Sky","Website":"https://www.hersmellmovie.com/","Response":"True"},'Gloria Bell':{"Title":"Gloria Bell","Year":"2018","Rated":"R","Released":"22 Mar 2019","Runtime":"102 min","Genre":"Comedy, Drama, Romance","Director":"Sebastián Lelio","Writer":"Alice Johnson Boher (adapted screenplay), Sebastián Lelio, Gonzalo Maza (story)","Actors":"Julianne Moore, John Turturro, Caren Pistorius, Michael Cera","Plot":"A free-spirited woman in her 50s seeks out love at L.A. dance clubs.","Language":"English","Country":"Chile, USA","Awards":"N/A","Poster":"https://m.media-amazon.com/images/M/MV5BMTc5Nzc1OTk3OV5BMl5BanBnXkFtZTgwNDM1NTQ3NjM@._V1_SX300.jpg","Ratings":[{"Source":"Internet Movie Database","Value":"6.4/10"},{"Source":"Metacritic","Value":"79/100"}],"Metascore":"79","imdbRating":"6.4","imdbVotes":"4,737","imdbID":"tt6902696","Type":"movie","DVD":"N/A","BoxOffice":"N/A","Production":"N/A","Website":"N/A","Response":"True"},'After':{"Title":"After","Year":"2019","Rated":"PG-13","Released":"12 Apr 2019","Runtime":"105 min","Genre":"Drama, Romance","Director":"Jenny Gage","Writer":"Tom Betterton (screenplay by), Tamara Chestna (screenplay by), Jenny Gage (screenplay by), Susan McMartin (screenplay by), Anna Todd (novel)","Actors":"Josephine Langford, Hero Fiennes Tiffin, Khadijha Red Thunder, Dylan Arnold","Plot":"A young woman falls for a guy with a dark secret and the two embark on a rocky relationship. Based on the novel by Anna Todd.","Language":"English","Country":"USA","Awards":"N/A","Poster":"https://m.media-amazon.com/images/M/MV5BOGUwMjk3YzktNDI0Yy00MzFiLWFjNmEtYTA2ODVjMzNhODhjXkEyXkFqcGdeQXVyOTQ1MDI4MzY@._V1_SX300.jpg","Ratings":[{"Source":"Internet Movie Database","Value":"5.5/10"},{"Source":"Rotten Tomatoes","Value":"16%"},{"Source":"Metacritic","Value":"30/100"}],"Metascore":"30","imdbRating":"5.5","imdbVotes":"13,596","imdbID":"tt4126476","Type":"movie","DVD":"09 Jul 2019","BoxOffice":"N/A","Production":"Aviron Pictures","Website":"https://www.after-themovie.com/","Response":"True"}}
 
 print('\nMovies loaded.\n')
@@ -154,25 +183,13 @@ print('\nMovies loaded.\n')
 # 2. Get all movie prod,meta,etc. data
 # 3. Movie list
 
-def flag_process(flag):
-    '''
-    if flag help! print help file
-    if flag -r print ratings
-    if flag -a print all
-    if flag -p print all
-    if flag -m print all
-    if flag unknown print unrecognized command
-    :param flag:
-    :return:
-    '''
-
-
 
 '''parse the user input'''
-# uinput = 'After -r -all'
-command = input('Enter [movie] -[flag] and press enter.  Type "help" for more info.\n')
+command = 'After -r -all'
+# command = input('Enter [movie] -[flag] and press enter.  Type "help" for more info.\n')
 if command.strip().lower() == 'help':
     print_help()
+
     #todo add return to ask for input
 
 command = parse_user_input(command)
@@ -182,7 +199,7 @@ command = parse_user_input(command)
 try:
     if command.group(1) in movie_dict:
         movie = Movie(command.group(1), movie_dict)
-        flag = flag_process(command.group)
+        flag = flag_process(command.group(2))
 
     else:
         print('Movie not recognized.\n*** TITLES ARE CASE-SENISITVE ***\nTo see the loaded movies, type "movies!".  For list of flags type "help!" and press enter.')
@@ -193,19 +210,19 @@ except AttributeError:
     else:
         print('Command not recognized.\nFor list of commands type "help!" and press enter.')
 
-
-'''if flag = -r then...'''
-
-print_ratings(movie.get_ratings())
-
-'''if flag = -a then...'''
-
-print_dict_pairs_neat(movie.get_all_data(),'all data')
-
-'''if flag = -p then...'''
-
-print_dict_pairs_neat(movie.get_production_data(),'production data')
-
-'''if flag = -m then...'''
-
-print_dict_pairs_neat(movie.get_metadata(),'metadata')
+#
+# '''if flag = -r then...'''
+#
+# print_ratings(movie.get_ratings())
+#
+# '''if flag = -a then...'''
+#
+# print_dict_pairs_neat(movie.get_all_data(),'all data')
+#
+# '''if flag = -p then...'''
+#
+# print_dict_pairs_neat(movie.get_production_data(),'production data')
+#
+# '''if flag = -m then...'''
+#
+# print_dict_pairs_neat(movie.get_metadata(),'metadata')
