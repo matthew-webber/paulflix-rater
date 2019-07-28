@@ -3,10 +3,10 @@ import requests as r
 import json
 
 flag_dict = {
-    '-r': {'Action': "Print object ratings", 'Other': "_"},
-    '-a': {'Action': "Print all attributes of movie object", 'Other': "_"},
-    'p': {'Action': "Print object production data", 'Other': "_"},
-    'm': {'Action': "Print object metadata", 'Other': "_"}}
+    'Flag1': {'Action': "Print movie ratings", 'Other': "_", 'Symbol': 'r'},
+    'Flag2': {'Action': "Print all movie data", 'Other': "_", 'Symbol': 'a'},
+    'Flag3': {'Action': "Print movie production data", 'Other': "_", 'Symbol': 'p'},
+    'Flag4': {'Action': "Print movie metadata", 'Other': "_", 'Symbol': 'm'}}
 
 #todo add way to print out flag dict in help string
 help_plz_kthx = """
@@ -19,13 +19,22 @@ help_plz_kthx = """
     
     Flags List
     
-    {flag1} :   {flag1_action}
-    {flag2} :   {flag2_action}
-    {flag3} :   {flag3_action}
-    {flag4} :   {flag4_action}
+    -{flag1} :   {flag1_action}
+    -{flag2} :   {flag2_action}
+    -{flag3} :   {flag3_action}
+    -{flag4} :   {flag4_action}
     
     *** End Help File ***
-    """
+    """.format(
+    flag1 = flag_dict['Flag1']['Symbol'],
+    flag2 = flag_dict['Flag2']['Symbol'],
+    flag3 = flag_dict['Flag3']['Symbol'],
+    flag4 = flag_dict['Flag4']['Symbol'],
+    flag1_action = flag_dict['Flag1']['Action'],
+    flag2_action = flag_dict['Flag2']['Action'],
+    flag3_action = flag_dict['Flag3']['Action'],
+    flag4_action = flag_dict['Flag4']['Action'],
+)
 
 def flatten_string(string):
 
@@ -143,8 +152,7 @@ print('\nMovies loaded.\n')
 #todo: move this to the top
 # 1. Get all movie ratings
 # 2. Get all movie prod,meta,etc. data
-# 3. help! flag
-# 4. Movie list
+# 3. Movie list
 
 def flag_process(flag):
     '''
@@ -171,17 +179,6 @@ command = parse_user_input(command)
 
 '''grab movie from the user input'''
 
-'''
-'help!'
-    show help
-not recognize movie
-    movie not found
-    warn about case sensitivity
-    try again / see movie list / help
-
-
-
-'''
 try:
     if command.group(1) in movie_dict:
         movie = Movie(command.group(1), movie_dict)
