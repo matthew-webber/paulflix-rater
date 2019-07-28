@@ -3,15 +3,34 @@ import requests as r
 import json
 
 flag_dict = {
-    '-r': {'Action': "Print object ratings", 'Other': _},
-    '-a': {'Action': "Print all attributes of movie object", 'Other': _},
-    'p': {'Action': "Print object production data", 'Other': _},
-    'm': {'Action': "Print object metadata", 'Other': _}}
+    '-r': {'Action': "Print object ratings", 'Other': "_"},
+    '-a': {'Action': "Print all attributes of movie object", 'Other': "_"},
+    'p': {'Action': "Print object production data", 'Other': "_"},
+    'm': {'Action': "Print object metadata", 'Other': "_"}}
 
+#todo add way to print out flag dict in help string
 help_plz_kthx = """
+    *** Begin Help File ***
+    
+    General help
+    
     To do this, type "that" and press enter.
-    To do something else, type "thisthat" and press enter. 
+    To do something else, type "thisthat" and press enter.
+    
+    Flags List
+    
+    {flag1} :   {flag1_action}
+    {flag2} :   {flag2_action}
+    {flag3} :   {flag3_action}
+    {flag4} :   {flag4_action}
+    
+    *** End Help File ***
     """
+
+def flatten_string(string):
+
+    return string.upper().strip()
+
 
 def print_help():
 
@@ -22,6 +41,7 @@ def print_movies(movie_dict):
 
     for movie in movie_dict:
         print(movie)
+
 
 def print_dict_pairs_neat(dict, print_name):
 
@@ -40,10 +60,12 @@ def print_ratings(dict):
 
 
 def parse_user_input(uinput):
+    #todo remove third flag element
     match_object = re.match(r"([\w\W\d]+?) (-\w{1,4}) (-\w{1,4})", uinput)
     if match_object is None:
         return uinput
     return match_object
+
 
 class Movie:
 
@@ -121,12 +143,12 @@ print('\nMovies loaded.\n')
 #todo: move this to the top
 # 1. Get all movie ratings
 # 2. Get all movie prod,meta,etc. data
-# 3. Help flag
+# 3. help! flag
 # 4. Movie list
 
 def flag_process(flag):
     '''
-    if flag help print help file
+    if flag help! print help file
     if flag -r print ratings
     if flag -a print all
     if flag -p print all
@@ -140,20 +162,22 @@ def flag_process(flag):
 
 '''parse the user input'''
 # uinput = 'After -r -all'
-uinput = input('Type movie name\n')
-command = parse_user_input(uinput)
+command = input('Enter [movie] -[flag] and press enter.  Type "help" for more info.\n')
+if command.strip().lower() == 'help':
+    print_help()
+    #todo add return to ask for input
+
+command = parse_user_input(command)
 
 '''grab movie from the user input'''
 
 '''
-'help'
+'help!'
     show help
 not recognize movie
     movie not found
+    warn about case sensitivity
     try again / see movie list / help
-movie only no flag
-    flag not found
-    add flag and try again / help
 
 
 
@@ -161,14 +185,17 @@ movie only no flag
 try:
     if command.group(1) in movie_dict:
         movie = Movie(command.group(1), movie_dict)
+        flag = flag_process(command.group)
+
     else:
-        response = flag_process(command.group)
-        pass
+        print('Movie not recognized.\n*** TITLES ARE CASE-SENISITVE ***\nTo see the loaded movies, type "movies!".  For list of flags type "help!" and press enter.')
+
 except AttributeError:
     if command in movie_dict:
-        movie = Movie(command, movie_dict)
+        print('Flag not recognized.\nAdd a flag and try again.  For list of flags type "help!" and press enter.')
     else:
-        pass
+        print('Command not recognized.\nFor list of commands type "help!" and press enter.')
+
 
 '''if flag = -r then...'''
 
