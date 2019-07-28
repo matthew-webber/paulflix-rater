@@ -2,6 +2,27 @@ import re
 import requests as r
 import json
 
+flag_dict = {
+    '-r': {'Action': "Print object ratings", 'Other': _},
+    '-a': {'Action': "Print all attributes of movie object", 'Other': _},
+    'p': {'Action': "Print object production data", 'Other': _},
+    'm': {'Action': "Print object metadata", 'Other': _}}
+
+help_plz_kthx = """
+    To do this, type "that" and press enter.
+    To do something else, type "thisthat" and press enter. 
+    """
+
+def print_help():
+
+    print(help_plz_kthx)
+
+
+def print_movies(movie_dict):
+
+    for movie in movie_dict:
+        print(movie)
+
 def print_dict_pairs_neat(dict, print_name):
 
     print('Printing {}...'.format(print_name))
@@ -97,6 +118,26 @@ movie_dict = {'Her Smell':{"Title":"Her Smell","Year":"2018","Rated":"R","Releas
 
 print('\nMovies loaded.\n')
 
+#todo: move this to the top
+# 1. Get all movie ratings
+# 2. Get all movie prod,meta,etc. data
+# 3. Help flag
+# 4. Movie list
+
+def flag_process(flag):
+    '''
+    if flag help print help file
+    if flag -r print ratings
+    if flag -a print all
+    if flag -p print all
+    if flag -m print all
+    if flag unknown print unrecognized command
+    :param flag:
+    :return:
+    '''
+
+
+
 '''parse the user input'''
 # uinput = 'After -r -all'
 uinput = input('Type movie name\n')
@@ -104,11 +145,24 @@ command = parse_user_input(uinput)
 
 '''grab movie from the user input'''
 
+'''
+'help'
+    show help
+not recognize movie
+    movie not found
+    try again / see movie list / help
+movie only no flag
+    flag not found
+    add flag and try again / help
+
+
+
+'''
 try:
     if command.group(1) in movie_dict:
         movie = Movie(command.group(1), movie_dict)
     else:
-        #process_command(command.group(1))
+        response = flag_process(command.group)
         pass
 except AttributeError:
     if command in movie_dict:
