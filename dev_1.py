@@ -19,8 +19,10 @@ def print_ratings(dict):
 
 
 def parse_user_input(uinput):
-
-    return re.match(r"([\w\W\d]+?) (-\w{1,4}) (-\w{1,4})", uinput)
+    match_object = re.match(r"([\w\W\d]+?) (-\w{1,4}) (-\w{1,4})", uinput)
+    if match_object is None:
+        return uinput
+    return match_object
 
 class Movie:
 
@@ -96,28 +98,36 @@ movie_dict = {'Her Smell':{"Title":"Her Smell","Year":"2018","Rated":"R","Releas
 print('\nMovies loaded.\n')
 
 '''parse the user input'''
-uinput = 'After -r -all'
+# uinput = 'After -r -all'
+uinput = input('Type movie name\n')
 command = parse_user_input(uinput)
 
 '''grab movie from the user input'''
 
-if command.group(1) in movie_dict:
-    movie = Movie(command.group(1), movie_dict)
-else:
-    #process_command(command.group(1))
+try:
+    if command.group(1) in movie_dict:
+        movie = Movie(command.group(1), movie_dict)
+    else:
+        #process_command(command.group(1))
+        pass
+except AttributeError:
+    if command in movie_dict:
+        movie = Movie(command, movie_dict)
+    else:
+        pass
 
 '''if flag = -r then...'''
 
-print_ratings(command.get_ratings())
+print_ratings(movie.get_ratings())
 
 '''if flag = -a then...'''
 
-print_dict_pairs_neat(command.get_all_data(),'all data')
+print_dict_pairs_neat(movie.get_all_data(),'all data')
 
 '''if flag = -p then...'''
 
-print_dict_pairs_neat(command.get_production_data(),'production data')
+print_dict_pairs_neat(movie.get_production_data(),'production data')
 
 '''if flag = -m then...'''
 
-print_dict_pairs_neat(command.get_metadata(),'metadata')
+print_dict_pairs_neat(movie.get_metadata(),'metadata')
