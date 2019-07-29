@@ -3,7 +3,12 @@ import requests as r
 import json
 
 
+def clean_title(movie):
 
+    unformatted_title = re.match(r'(.+?)(?:.m4v.+| \(\d{1,4}p HD\).+| \(HD\).+)', movie)
+
+    if unformatted_title:
+        return unformatted_title.group(1).replace("_", ":")
 
 
 def flatten_string(string):
@@ -40,7 +45,7 @@ def print_ratings(dict):
 
 def parse_user_input(uinput):
     #todo remove third flag element
-    match_object = re.match(r"([\w\W\d]+?) (-\w{1,4}) (-\w{1,4})", uinput)
+    match_object = re.match(r"([\w\W\d]+?) (-\w{1,4})", uinput)
     if match_object is None:
         return uinput
     return match_object
@@ -174,56 +179,90 @@ help_plz_kthx = """
     flag4_action=flag_dict['Flag4']['Action'],
 )
 
+''' Ask for movies '''
 
-movie_dict = {'Her Smell':{"Title":"Her Smell","Year":"2018","Rated":"R","Released":"10 May 2019","Runtime":"134 min","Genre":"Drama, Music","Director":"Alex Ross Perry","Writer":"Alex Ross Perry","Actors":"Elisabeth Moss, Angel Christian Roman, Cara Delevingne, Dan Stevens","Plot":"A self-destructive punk rocker struggles with sobriety while trying to recapture the creative inspiration that led her band to success.","Language":"English","Country":"USA, Greece","Awards":"N/A","Poster":"https://m.media-amazon.com/images/M/MV5BMTk2Mzg4NzI3NF5BMl5BanBnXkFtZTgwMzE5NDk1NzM@._V1_SX300.jpg","Ratings":[{"Source":"Internet Movie Database","Value":"6.2/10"},{"Source":"Rotten Tomatoes","Value":"84%"},{"Source":"Metacritic","Value":"69/100"}],"Metascore":"69","imdbRating":"6.2","imdbVotes":"1,219","imdbID":"tt7942742","Type":"movie","DVD":"N/A","BoxOffice":"N/A","Production":"Gunpowder &amp; Sky","Website":"https://www.hersmellmovie.com/","Response":"True"},'Gloria Bell':{"Title":"Gloria Bell","Year":"2018","Rated":"R","Released":"22 Mar 2019","Runtime":"102 min","Genre":"Comedy, Drama, Romance","Director":"Sebastián Lelio","Writer":"Alice Johnson Boher (adapted screenplay), Sebastián Lelio, Gonzalo Maza (story)","Actors":"Julianne Moore, John Turturro, Caren Pistorius, Michael Cera","Plot":"A free-spirited woman in her 50s seeks out love at L.A. dance clubs.","Language":"English","Country":"Chile, USA","Awards":"N/A","Poster":"https://m.media-amazon.com/images/M/MV5BMTc5Nzc1OTk3OV5BMl5BanBnXkFtZTgwNDM1NTQ3NjM@._V1_SX300.jpg","Ratings":[{"Source":"Internet Movie Database","Value":"6.4/10"},{"Source":"Metacritic","Value":"79/100"}],"Metascore":"79","imdbRating":"6.4","imdbVotes":"4,737","imdbID":"tt6902696","Type":"movie","DVD":"N/A","BoxOffice":"N/A","Production":"N/A","Website":"N/A","Response":"True"},'After':{"Title":"After","Year":"2019","Rated":"PG-13","Released":"12 Apr 2019","Runtime":"105 min","Genre":"Drama, Romance","Director":"Jenny Gage","Writer":"Tom Betterton (screenplay by), Tamara Chestna (screenplay by), Jenny Gage (screenplay by), Susan McMartin (screenplay by), Anna Todd (novel)","Actors":"Josephine Langford, Hero Fiennes Tiffin, Khadijha Red Thunder, Dylan Arnold","Plot":"A young woman falls for a guy with a dark secret and the two embark on a rocky relationship. Based on the novel by Anna Todd.","Language":"English","Country":"USA","Awards":"N/A","Poster":"https://m.media-amazon.com/images/M/MV5BOGUwMjk3YzktNDI0Yy00MzFiLWFjNmEtYTA2ODVjMzNhODhjXkEyXkFqcGdeQXVyOTQ1MDI4MzY@._V1_SX300.jpg","Ratings":[{"Source":"Internet Movie Database","Value":"5.5/10"},{"Source":"Rotten Tomatoes","Value":"16%"},{"Source":"Metacritic","Value":"30/100"}],"Metascore":"30","imdbRating":"5.5","imdbVotes":"13,596","imdbID":"tt4126476","Type":"movie","DVD":"09 Jul 2019","BoxOffice":"N/A","Production":"Aviron Pictures","Website":"https://www.after-themovie.com/","Response":"True"}}
+movie_dict = {}
+
+while True:
+
+    titles = input("""
+    First things first, you have to load movies into the program.
+    Copy and paste entire lines below and press Enter.
+    Press X to exit.\n""")
+
+    if titles.strip().upper() == 'X':
+        print('Exiting...')
+        break
+
+    elif titles.strip() == '':
+        print('Command not recognized.\n')
+        continue
+
+    else:
+        ''' Cleaning input '''
+
+        print('Loading movies...\n')
+
+        api_url = 'http://www.omdbapi.com/?apikey=f2caa646&t='.encode()
+
+        for dirty_title in titles.split('\n'):
+
+            movie_title = clean_title(dirty_title)
+
+            if movie_title == None:
+
+                print('Skipping {}...'.format(dirty_title))
+                continue
+
+            ''' get REQUESTS data '''
+
+
+            response = r.get(api_url + movie_title.encode())
+
+            movie_data = json.loads(response.text)
+            movie_dict[movie_title] = movie_data
+
+        break # move to the next loop
+
 
 print('\nMovies loaded.\n')
 
-#todo: move this to the top
-# 1. Get all movie ratings
-# 2. Get all movie prod,meta,etc. data
-# 3. Movie list
+
+# movie_dict = {'Her Smell':{"Title":"Her Smell","Year":"2018","Rated":"R","Released":"10 May 2019","Runtime":"134 min","Genre":"Drama, Music","Director":"Alex Ross Perry","Writer":"Alex Ross Perry","Actors":"Elisabeth Moss, Angel Christian Roman, Cara Delevingne, Dan Stevens","Plot":"A self-destructive punk rocker struggles with sobriety while trying to recapture the creative inspiration that led her band to success.","Language":"English","Country":"USA, Greece","Awards":"N/A","Poster":"https://m.media-amazon.com/images/M/MV5BMTk2Mzg4NzI3NF5BMl5BanBnXkFtZTgwMzE5NDk1NzM@._V1_SX300.jpg","Ratings":[{"Source":"Internet Movie Database","Value":"6.2/10"},{"Source":"Rotten Tomatoes","Value":"84%"},{"Source":"Metacritic","Value":"69/100"}],"Metascore":"69","imdbRating":"6.2","imdbVotes":"1,219","imdbID":"tt7942742","Type":"movie","DVD":"N/A","BoxOffice":"N/A","Production":"Gunpowder &amp; Sky","Website":"https://www.hersmellmovie.com/","Response":"True"},'Gloria Bell':{"Title":"Gloria Bell","Year":"2018","Rated":"R","Released":"22 Mar 2019","Runtime":"102 min","Genre":"Comedy, Drama, Romance","Director":"Sebastián Lelio","Writer":"Alice Johnson Boher (adapted screenplay), Sebastián Lelio, Gonzalo Maza (story)","Actors":"Julianne Moore, John Turturro, Caren Pistorius, Michael Cera","Plot":"A free-spirited woman in her 50s seeks out love at L.A. dance clubs.","Language":"English","Country":"Chile, USA","Awards":"N/A","Poster":"https://m.media-amazon.com/images/M/MV5BMTc5Nzc1OTk3OV5BMl5BanBnXkFtZTgwNDM1NTQ3NjM@._V1_SX300.jpg","Ratings":[{"Source":"Internet Movie Database","Value":"6.4/10"},{"Source":"Metacritic","Value":"79/100"}],"Metascore":"79","imdbRating":"6.4","imdbVotes":"4,737","imdbID":"tt6902696","Type":"movie","DVD":"N/A","BoxOffice":"N/A","Production":"N/A","Website":"N/A","Response":"True"},'After':{"Title":"After","Year":"2019","Rated":"PG-13","Released":"12 Apr 2019","Runtime":"105 min","Genre":"Drama, Romance","Director":"Jenny Gage","Writer":"Tom Betterton (screenplay by), Tamara Chestna (screenplay by), Jenny Gage (screenplay by), Susan McMartin (screenplay by), Anna Todd (novel)","Actors":"Josephine Langford, Hero Fiennes Tiffin, Khadijha Red Thunder, Dylan Arnold","Plot":"A young woman falls for a guy with a dark secret and the two embark on a rocky relationship. Based on the novel by Anna Todd.","Language":"English","Country":"USA","Awards":"N/A","Poster":"https://m.media-amazon.com/images/M/MV5BOGUwMjk3YzktNDI0Yy00MzFiLWFjNmEtYTA2ODVjMzNhODhjXkEyXkFqcGdeQXVyOTQ1MDI4MzY@._V1_SX300.jpg","Ratings":[{"Source":"Internet Movie Database","Value":"5.5/10"},{"Source":"Rotten Tomatoes","Value":"16%"},{"Source":"Metacritic","Value":"30/100"}],"Metascore":"30","imdbRating":"5.5","imdbVotes":"13,596","imdbID":"tt4126476","Type":"movie","DVD":"09 Jul 2019","BoxOffice":"N/A","Production":"Aviron Pictures","Website":"https://www.after-themovie.com/","Response":"True"}}
 
 
 '''parse the user input'''
-command = 'After -m -all'
-# command = input('Enter [movie] -[flag] and press enter.  Type "help" for more info.  Type "X" to exit.\n')
-if command.strip().lower() == 'help':
-    print_help()
 
-    #todo add return to ask for input
 
-command = parse_user_input(command)
+while True:
 
-'''grab movie from the user input'''
+    command = input('\nEnter [movie] -[flag] and press enter.  Type "help" for more info.  Type "X" to exit.\n')
 
-try:
-    if command.group(1) in movie_dict:
-        movie = Movie(command.group(1), movie_dict)
-        flag = flag_process(command.group(2))
+    if command.strip().lower() == 'help':
+        print_help()
 
-    else:
-        print('Movie not recognized.\n*** TITLES ARE CASE-SENISITVE ***\nTo see the loaded movies, type "movies!".  For list of flags type "help!" and press enter.')
+    if command.strip().lower() == 'x':
+        print('Exiting...')
+        break
 
-except AttributeError:
-    if command in movie_dict:
-        print('Flag not recognized.\nAdd a flag and try again.  For list of flags type "help!" and press enter.')
-    else:
-        print('Command not recognized.\nFor list of commands type "help!" and press enter.')
+    command = parse_user_input(command)
 
-#
-# '''if flag = -r then...'''
-#
-# print_ratings(movie.get_ratings())
-#
-# '''if flag = -a then...'''
-#
-# print_dict_pairs_neat(movie.get_all_data(),'all data')
-#
-# '''if flag = -p then...'''
-#
-# print_dict_pairs_neat(movie.get_production_data(),'production data')
-#
-# '''if flag = -m then...'''
-#
-# print_dict_pairs_neat(movie.get_metadata(),'metadata')
+    '''grab command from the user input'''
+
+    try:
+        if command.group(1) in movie_dict:
+            movie = Movie(command.group(1), movie_dict)
+            flag_process(command.group(2))
+
+        else:
+            print(
+                'Movie not recognized.\n'
+                '*** TITLES ARE CASE-SENISITVE ***\n'
+                'To see the loaded movies, type "movies!".  For list of flags type "help!" and press enter.'
+            )
+
+    except AttributeError:
+        if command in movie_dict:
+            print('Flag not recognized.\nAdd a flag and try again.  For list of flags type "help!" and press enter.')
+        else:
+            print('Command not recognized.\nFor list of commands type "help!" and press enter.')

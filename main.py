@@ -3,29 +3,22 @@ import requests as r
 import json
 
 
-def clean_title(movie):
-
-    unformatted_title = re.match(r'(.+?)(?:.m4v.+| \(\d{1,4}p HD\).+| \(HD\).+)', movie)
-
-    if unformatted_title:
-        return unformatted_title.group(1).replace("_", ":")
-
-
 def input_reader(command):
+
     if command == 'X':
         return "Exiting..."
 
 
-class UserCommand:
-
-    def __init__(self, command, flag1, flag2):
-        self.command = command
-        self.flag1 = flag1
-        self.flag2 = flag2
-
-    def get_ratings(self, movie_dict):
-        if self.flag2 == '-rt':
-            pass
+# class UserCommand:
+#
+#     def __init__(self, command, flag1, flag2):
+#         self.command = command
+#         self.flag1 = flag1
+#         self.flag2 = flag2
+#
+#     def get_ratings(self, movie_dict):
+#         if self.flag2 == '-rt':
+#             pass
 
 
 
