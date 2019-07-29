@@ -187,7 +187,7 @@ print('\nMovies loaded.\n')
 
 '''parse the user input'''
 command = 'After -m -all'
-# command = input('Enter [movie] -[flag] and press enter.  Type "help" for more info.\n')
+# command = input('Enter [movie] -[flag] and press enter.  Type "help" for more info.  Type "X" to exit.\n')
 if command.strip().lower() == 'help':
     print_help()
 
