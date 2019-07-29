@@ -1,76 +1,55 @@
-import re
 import requests as r
 import json
+import func_lib
 
+#todo check if the movie_dict[movie]["Title"] matches the key (movie title)
+# if it doesn't, prompt user to fix the key / add more details and GET
+# again / skip the record
 
-def clean_title(movie):
+def flag_process(flag):
+    '''
+    if flag -r print ratings
+    if flag -a print all
+    if flag -p print production data
+    if flag -m print metadata
+    :param flag:
+    :return:
+    '''
 
-    unformatted_title = re.match(r'(.+?)(?:.m4v.+| \(\d{1,4}p HD\).+| \(HD\).+)', movie)
+    # todo look for "-" to indicate flag
+    # todo better way to strip flag of minus sign?
 
-    if unformatted_title:
-        return unformatted_title.group(1).replace("_", ":")
+    flag = flag.replace("-", "")
 
-
-def flatten_string(string):
-
-    return string.upper().strip()
-
-
-def print_help():
-
-    print(help_plz_kthx)
-
-
-def print_movies(movie_dict):
-
-    for movie in movie_dict:
-        print(movie)
-
-
-def print_dict_pairs_neat(dict, print_name):
-
-    print('Printing {}...'.format(print_name))
-
-    for k, v in dict.items():
-        print('\t', k.title(), ':', v)
-
-
-def print_ratings(dict):
-
-    print('Printing ratings...')
-
-    for k, v in dict.items():
-        print('\t', '{} gave it {}'.format(k, v))
-
-
-def parse_user_input(uinput):
-    #todo remove third flag element
-    match_object = re.match(r"([\w\W\d]+?) (-\w{1,4})", uinput)
-    if match_object is None:
-        return uinput
-    return match_object
-
+    if flag == 'r':
+        func_lib.print_dict_pairs_neat(movie.get_ratings(), 'ratings')
+    elif flag == 'a':
+        func_lib.print_dict_pairs_neat(movie.get_all_data(), 'all data')
+    elif flag == 'p':
+        func_lib.print_dict_pairs_neat(movie.get_production_data(), 'production data')
+    elif flag == 'm':
+        func_lib.print_dict_pairs_neat(movie.get_metadata(), 'metadata')
 
 class Movie:
 
     def __init__(self, title, movie_dict):
 
+        #todo if any of these values are missing, it shouldn't do a keyerror
         self.title = title
-        self.rated = movie_dict[title]['Rated'] # -m
-        self.released = movie_dict[title]['Released'] # -p
-        self.runtime = movie_dict[title]['Runtime'] # -m
-        self.genre = movie_dict[title]['Genre'] # -m
-        self.director = movie_dict[title]['Director'] # -p
-        self.writers = movie_dict[title]['Writer'] # -p
-        self.actors = movie_dict[title]['Actors'] # -p
-        self.plot = movie_dict[title]['Plot'] # -m
-        self.language = movie_dict[title]['Language'] # -m
-        self.country = movie_dict[title]['Country'] # -m
-        self.awards = movie_dict[title]['Awards'] # -m
-        self.production = movie_dict[title]['Production'] # -p
-        self.ratings = movie_dict[title]['Ratings'] # -r -m
+        self.rated = movie_dict[title]['Rated']  # -m
+        self.released = movie_dict[title]['Released']  # -p
+        self.runtime = movie_dict[title]['Runtime']  # -m
+        self.genre = movie_dict[title]['Genre']  # -m
+        self.director = movie_dict[title]['Director']  # -p
+        self.writers = movie_dict[title]['Writer']  # -p
+        self.actors = movie_dict[title]['Actors']  # -p
+        self.plot = movie_dict[title]['Plot']  # -m
+        self.language = movie_dict[title]['Language']  # -m
+        self.country = movie_dict[title]['Country']  # -m
+        self.awards = movie_dict[title]['Awards']  # -m
+        self.production = movie_dict[title]['Production']  # -p
+        self.ratings = movie_dict[title]['Ratings']  # -r -m
         self.imdb_votes = movie_dict[title]['imdbVotes']
-
 
     def get_ratings(self):
 
@@ -101,7 +80,6 @@ class Movie:
 
         return production_dict
 
-
     def get_metadata(self):
 
         metadata_dict = {
@@ -119,65 +97,6 @@ class Movie:
 
         return metadata_dict
 
-
-def flag_process(flag):
-    '''
-    if flag -r print ratings
-    if flag -a print all
-    if flag -p print production data
-    if flag -m print metadata
-    :param flag:
-    :return:
-    '''
-
-    #todo look for "-" to indicate flag
-    # better way to strip flag of minus sign?
-
-    flag = flag.replace("-","")
-
-    if flag == 'r':
-        print_dict_pairs_neat(movie.get_ratings(), 'ratings')
-    elif flag == 'a':
-        print_dict_pairs_neat(movie.get_all_data(), 'all data')
-    elif flag == 'p':
-        print_dict_pairs_neat(movie.get_production_data(), 'production data')
-    elif flag == 'm':
-        print_dict_pairs_neat(movie.get_metadata(), 'metadata')
-
-
-flag_dict = {
-    'Flag1': {'Action': "Print movie ratings", 'Symbol': 'r'},
-    'Flag2': {'Action': "Print all movie data", 'Function': "_", 'Symbol': 'a'},
-    'Flag3': {'Action': "Print movie production Function", 'Other': "_", 'Symbol': 'p'},
-    'Flag4': {'Action': "Print movie metadata", 'Function': "_", 'Symbol': 'm'}}
-
-help_plz_kthx = """
-    *** Begin Help File ***
-
-    General help
-
-    To do this, type "that" and press enter.
-    To do something else, type "thisthat" and press enter.
-
-    Flags List
-
-    -{flag1} :   {flag1_action}
-    -{flag2} :   {flag2_action}
-    -{flag3} :   {flag3_action}
-    -{flag4} :   {flag4_action}
-
-    *** End Help File ***
-    
-    """.format(
-    flag1=flag_dict['Flag1']['Symbol'],
-    flag2=flag_dict['Flag2']['Symbol'],
-    flag3=flag_dict['Flag3']['Symbol'],
-    flag4=flag_dict['Flag4']['Symbol'],
-    flag1_action=flag_dict['Flag1']['Action'],
-    flag2_action=flag_dict['Flag2']['Action'],
-    flag3_action=flag_dict['Flag3']['Action'],
-    flag4_action=flag_dict['Flag4']['Action'],
-)
 
 ''' Ask for movies '''
 
@@ -207,7 +126,7 @@ while True:
 
         for dirty_title in titles.split('\n'):
 
-            movie_title = clean_title(dirty_title)
+            movie_title = func_lib.clean_title(dirty_title)
 
             if movie_title == None:
 
@@ -216,11 +135,10 @@ while True:
 
             ''' get REQUESTS data '''
 
-
-            response = r.get(api_url + movie_title.encode())
-
-            movie_data = json.loads(response.text)
-            movie_dict[movie_title] = movie_data
+            # response = r.get(api_url + movie_title.encode())
+            #
+            # movie_data = json.loads(response.text)
+            # movie_dict[movie_title] = movie_data
 
         break # move to the next loop
 
@@ -228,7 +146,7 @@ while True:
 print('\nMovies loaded.\n')
 
 
-# movie_dict = {'Her Smell':{"Title":"Her Smell","Year":"2018","Rated":"R","Released":"10 May 2019","Runtime":"134 min","Genre":"Drama, Music","Director":"Alex Ross Perry","Writer":"Alex Ross Perry","Actors":"Elisabeth Moss, Angel Christian Roman, Cara Delevingne, Dan Stevens","Plot":"A self-destructive punk rocker struggles with sobriety while trying to recapture the creative inspiration that led her band to success.","Language":"English","Country":"USA, Greece","Awards":"N/A","Poster":"https://m.media-amazon.com/images/M/MV5BMTk2Mzg4NzI3NF5BMl5BanBnXkFtZTgwMzE5NDk1NzM@._V1_SX300.jpg","Ratings":[{"Source":"Internet Movie Database","Value":"6.2/10"},{"Source":"Rotten Tomatoes","Value":"84%"},{"Source":"Metacritic","Value":"69/100"}],"Metascore":"69","imdbRating":"6.2","imdbVotes":"1,219","imdbID":"tt7942742","Type":"movie","DVD":"N/A","BoxOffice":"N/A","Production":"Gunpowder &amp; Sky","Website":"https://www.hersmellmovie.com/","Response":"True"},'Gloria Bell':{"Title":"Gloria Bell","Year":"2018","Rated":"R","Released":"22 Mar 2019","Runtime":"102 min","Genre":"Comedy, Drama, Romance","Director":"Sebastián Lelio","Writer":"Alice Johnson Boher (adapted screenplay), Sebastián Lelio, Gonzalo Maza (story)","Actors":"Julianne Moore, John Turturro, Caren Pistorius, Michael Cera","Plot":"A free-spirited woman in her 50s seeks out love at L.A. dance clubs.","Language":"English","Country":"Chile, USA","Awards":"N/A","Poster":"https://m.media-amazon.com/images/M/MV5BMTc5Nzc1OTk3OV5BMl5BanBnXkFtZTgwNDM1NTQ3NjM@._V1_SX300.jpg","Ratings":[{"Source":"Internet Movie Database","Value":"6.4/10"},{"Source":"Metacritic","Value":"79/100"}],"Metascore":"79","imdbRating":"6.4","imdbVotes":"4,737","imdbID":"tt6902696","Type":"movie","DVD":"N/A","BoxOffice":"N/A","Production":"N/A","Website":"N/A","Response":"True"},'After':{"Title":"After","Year":"2019","Rated":"PG-13","Released":"12 Apr 2019","Runtime":"105 min","Genre":"Drama, Romance","Director":"Jenny Gage","Writer":"Tom Betterton (screenplay by), Tamara Chestna (screenplay by), Jenny Gage (screenplay by), Susan McMartin (screenplay by), Anna Todd (novel)","Actors":"Josephine Langford, Hero Fiennes Tiffin, Khadijha Red Thunder, Dylan Arnold","Plot":"A young woman falls for a guy with a dark secret and the two embark on a rocky relationship. Based on the novel by Anna Todd.","Language":"English","Country":"USA","Awards":"N/A","Poster":"https://m.media-amazon.com/images/M/MV5BOGUwMjk3YzktNDI0Yy00MzFiLWFjNmEtYTA2ODVjMzNhODhjXkEyXkFqcGdeQXVyOTQ1MDI4MzY@._V1_SX300.jpg","Ratings":[{"Source":"Internet Movie Database","Value":"5.5/10"},{"Source":"Rotten Tomatoes","Value":"16%"},{"Source":"Metacritic","Value":"30/100"}],"Metascore":"30","imdbRating":"5.5","imdbVotes":"13,596","imdbID":"tt4126476","Type":"movie","DVD":"09 Jul 2019","BoxOffice":"N/A","Production":"Aviron Pictures","Website":"https://www.after-themovie.com/","Response":"True"}}
+movie_dict = {'Her Smell':{"Title":"Her Smell","Year":"2018","Rated":"R","Released":"10 May 2019","Runtime":"134 min","Genre":"Drama, Music","Director":"Alex Ross Perry","Writer":"Alex Ross Perry","Actors":"Elisabeth Moss, Angel Christian Roman, Cara Delevingne, Dan Stevens","Plot":"A self-destructive punk rocker struggles with sobriety while trying to recapture the creative inspiration that led her band to success.","Language":"English","Country":"USA, Greece","Awards":"N/A","Poster":"https://m.media-amazon.com/images/M/MV5BMTk2Mzg4NzI3NF5BMl5BanBnXkFtZTgwMzE5NDk1NzM@._V1_SX300.jpg","Ratings":[{"Source":"Internet Movie Database","Value":"6.2/10"},{"Source":"Rotten Tomatoes","Value":"84%"},{"Source":"Metacritic","Value":"69/100"}],"Metascore":"69","imdbRating":"6.2","imdbVotes":"1,219","imdbID":"tt7942742","Type":"movie","DVD":"N/A","BoxOffice":"N/A","Production":"Gunpowder &amp; Sky","Website":"https://www.hersmellmovie.com/","Response":"True"},'Gloria Bell':{"Title":"Gloria Bell","Year":"2018","Rated":"R","Released":"22 Mar 2019","Runtime":"102 min","Genre":"Comedy, Drama, Romance","Director":"Sebastián Lelio","Writer":"Alice Johnson Boher (adapted screenplay), Sebastián Lelio, Gonzalo Maza (story)","Actors":"Julianne Moore, John Turturro, Caren Pistorius, Michael Cera","Plot":"A free-spirited woman in her 50s seeks out love at L.A. dance clubs.","Language":"English","Country":"Chile, USA","Awards":"N/A","Poster":"https://m.media-amazon.com/images/M/MV5BMTc5Nzc1OTk3OV5BMl5BanBnXkFtZTgwNDM1NTQ3NjM@._V1_SX300.jpg","Ratings":[{"Source":"Internet Movie Database","Value":"6.4/10"},{"Source":"Metacritic","Value":"79/100"}],"Metascore":"79","imdbRating":"6.4","imdbVotes":"4,737","imdbID":"tt6902696","Type":"movie","DVD":"N/A","BoxOffice":"N/A","Production":"N/A","Website":"N/A","Response":"True"},'After':{"Title":"After","Year":"2019","Rated":"PG-13","Released":"12 Apr 2019","Runtime":"105 min","Genre":"Drama, Romance","Director":"Jenny Gage","Writer":"Tom Betterton (screenplay by), Tamara Chestna (screenplay by), Jenny Gage (screenplay by), Susan McMartin (screenplay by), Anna Todd (novel)","Actors":"Josephine Langford, Hero Fiennes Tiffin, Khadijha Red Thunder, Dylan Arnold","Plot":"A young woman falls for a guy with a dark secret and the two embark on a rocky relationship. Based on the novel by Anna Todd.","Language":"English","Country":"USA","Awards":"N/A","Poster":"https://m.media-amazon.com/images/M/MV5BOGUwMjk3YzktNDI0Yy00MzFiLWFjNmEtYTA2ODVjMzNhODhjXkEyXkFqcGdeQXVyOTQ1MDI4MzY@._V1_SX300.jpg","Ratings":[{"Source":"Internet Movie Database","Value":"5.5/10"},{"Source":"Rotten Tomatoes","Value":"16%"},{"Source":"Metacritic","Value":"30/100"}],"Metascore":"30","imdbRating":"5.5","imdbVotes":"13,596","imdbID":"tt4126476","Type":"movie","DVD":"09 Jul 2019","BoxOffice":"N/A","Production":"Aviron Pictures","Website":"https://www.after-themovie.com/","Response":"True"}}
 
 
 '''parse the user input'''
@@ -239,13 +157,13 @@ while True:
     command = input('\nEnter [movie] -[flag] and press enter.  Type "help" for more info.  Type "X" to exit.\n')
 
     if command.strip().lower() == 'help':
-        print_help()
+        func_lib.print_help()
 
     if command.strip().lower() == 'x':
         print('Exiting...')
         break
 
-    command = parse_user_input(command)
+    command = func_lib.parse_user_input(command)
 
     '''grab command from the user input'''
 
@@ -257,7 +175,7 @@ while True:
         else:
             print(
                 'Movie not recognized.\n'
-                '*** TITLES ARE CASE-SENISITVE ***\n'
+                '*** TITLES ARE CASE-SENSITIVE ***\n'
                 'To see the loaded movies, type "movies!".  For list of flags type "help!" and press enter.'
             )
 
