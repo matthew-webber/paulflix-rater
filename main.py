@@ -1,6 +1,7 @@
 import re
 import requests as r
 import json
+from func_lib import *
 
 
 def input_reader(command):
@@ -73,7 +74,7 @@ print('\nMovies loaded.\n')
 
 # print('To see Rotten Tomatoes rating, type [title] -r -rt.  For more, type -help.  To exit, type X.\n')
 
-# _ = input().upper().strip()
-_ = "Her Smell -r -rt"
-_ = re.match(r"([\w\W\d]+?) (-\w{1,4}) (-\w{1,4})", _)
-command = UserCommand(_.group(1), _.group(2), _.group(3))
+# # _ = input().upper().strip()
+# _ = "Her Smell -r -rt"
+# _ = re.match(r"([\w\W\d]+?) (-\w{1,4}) (-\w{1,4})", _)
+# command = UserCommand(_.group(1), _.group(2), _.group(3))

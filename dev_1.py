@@ -1,10 +1,84 @@
 import requests as r
 import json
 import func_lib
+import re
 
 #todo check if the movie_dict[movie]["Title"] matches the key (movie title)
 # if it doesn't, prompt user to fix the key / add more details and GET
 # again / skip the record
+
+regex = [
+    {
+      "pattern": "^\\[.+?\\][ -]+(.+)",
+      "replace": "$1"
+    },
+    {
+      "pattern": "^(.+?)[( .]?(\\d\\d\\d\\d)\\)?.+$",
+      "replace": "$1"
+    },
+    {
+      "pattern": "\\.",
+      "replace": " "
+    }
+]
+
+
+class StringCleaner:
+
+    def __init__(self):
+
+        self.target = None
+
+    def set_target(self, target):
+
+        self.target = target
+
+    def clean_all(self, regex):
+        """
+        Runs all regex patterns from config.json on self.target (movie title)
+        :param regex: array of regex objects from config.json
+        :return: str of self.target after all regex run
+        """
+
+        for rgx in regex:
+            regex = [*regex, (re.compile(rgx['pattern']), rgx['replace'])]
+            regex.remove(rgx)
+
+        cleaned = self.target  # copy for destructive changes to come
+
+        for r in regex:
+            groups = r[0].split(self.target)
+            cleaned = self.replacer(
+                groups=groups,
+                old_str=cleaned,
+                new_str=r[1],
+                compiled_pattern=r[0]
+            )
+
+        return cleaned.title()
+
+    @staticmethod
+    def replacer(groups, old_str, new_str, compiled_pattern):
+        """
+        :param groups: the result of splitting old_str against the compiled pattern (e.g. ['', 'title', 'year', '']
+        :param old_str: movie title
+        :param new_str: the replacement string (which becomes old_str after each iteration) (e.g. "$1 ($2)")
+        :param compiled_pattern: pattern to replace on thru each iteration
+        :return: either
+            a) str of replacement text subbed out with caught group from groups (old_str.groups()), or
+            b) str of old_str with w/ text replaced that matches pattern (i.e. no '$' in regex replace from json)
+        """
+
+        if "$" in new_str:  # if the regex "replace" str has a '$' in it, groups should have a caught group in it
+
+            for i in range(1, len(groups)):
+
+                new_str = (re.sub(f'\${i}', groups[i], new_str))
+        else:
+
+            new_str = compiled_pattern.sub(new_str, old_str)
+
+        return new_str
 
 def flag_process(flag):
     '''
@@ -104,29 +178,29 @@ movie_dict = {}
 
 while True:
 
-    titles = input("""
-    First things first, you have to load movies into the program.
-    Copy and paste entire lines below and press Enter.
-    Press X to exit.\n""")
-
+    # titles = input("""
+    # Loading the movies from movies.txt
+    # Enter 'X' to exit or anything else to continue.\n""")
+    titles = ''
     if titles.strip().upper() == 'X':
         print('Exiting...')
         break
 
-    elif titles.strip() == '':
-        print('Command not recognized.\n')
-        continue
-
     else:
         ''' Cleaning input '''
-
         print('Loading movies...\n')
 
         api_url = 'http://www.omdbapi.com/?apikey=f2caa646&t='.encode()
 
+        with open('movies.txt', 'r') as f:
+            titles = f.read()
+
         for dirty_title in titles.split('\n'):
 
-            movie_title = func_lib.clean_title(dirty_title)
+            # movie_title = func_lib.clean_title(dirty_title)
+            cleaner = StringCleaner()
+            cleaner.set_target(dirty_title)
+            movie_title = cleaner.clean_all(regex)
 
             if movie_title == None:
 
@@ -135,10 +209,11 @@ while True:
 
             ''' get REQUESTS data '''
 
-            # response = r.get(api_url + movie_title.encode())
-            #
-            # movie_data = json.loads(response.text)
-            # movie_dict[movie_title] = movie_data
+            response = r.get(api_url + movie_title.encode())
+
+            print('TITLE: ' + movie_title)
+            movie_data = json.loads(response.text)
+            movie_dict[movie_title] = movie_data
 
         break # move to the next loop
 
@@ -146,13 +221,31 @@ while True:
 print('\nMovies loaded.\n')
 
 
-movie_dict = {'Her Smell':{"Title":"Her Smell","Year":"2018","Rated":"R","Released":"10 May 2019","Runtime":"134 min","Genre":"Drama, Music","Director":"Alex Ross Perry","Writer":"Alex Ross Perry","Actors":"Elisabeth Moss, Angel Christian Roman, Cara Delevingne, Dan Stevens","Plot":"A self-destructive punk rocker struggles with sobriety while trying to recapture the creative inspiration that led her band to success.","Language":"English","Country":"USA, Greece","Awards":"N/A","Poster":"https://m.media-amazon.com/images/M/MV5BMTk2Mzg4NzI3NF5BMl5BanBnXkFtZTgwMzE5NDk1NzM@._V1_SX300.jpg","Ratings":[{"Source":"Internet Movie Database","Value":"6.2/10"},{"Source":"Rotten Tomatoes","Value":"84%"},{"Source":"Metacritic","Value":"69/100"}],"Metascore":"69","imdbRating":"6.2","imdbVotes":"1,219","imdbID":"tt7942742","Type":"movie","DVD":"N/A","BoxOffice":"N/A","Production":"Gunpowder &amp; Sky","Website":"https://www.hersmellmovie.com/","Response":"True"},'Gloria Bell':{"Title":"Gloria Bell","Year":"2018","Rated":"R","Released":"22 Mar 2019","Runtime":"102 min","Genre":"Comedy, Drama, Romance","Director":"Sebastián Lelio","Writer":"Alice Johnson Boher (adapted screenplay), Sebastián Lelio, Gonzalo Maza (story)","Actors":"Julianne Moore, John Turturro, Caren Pistorius, Michael Cera","Plot":"A free-spirited woman in her 50s seeks out love at L.A. dance clubs.","Language":"English","Country":"Chile, USA","Awards":"N/A","Poster":"https://m.media-amazon.com/images/M/MV5BMTc5Nzc1OTk3OV5BMl5BanBnXkFtZTgwNDM1NTQ3NjM@._V1_SX300.jpg","Ratings":[{"Source":"Internet Movie Database","Value":"6.4/10"},{"Source":"Metacritic","Value":"79/100"}],"Metascore":"79","imdbRating":"6.4","imdbVotes":"4,737","imdbID":"tt6902696","Type":"movie","DVD":"N/A","BoxOffice":"N/A","Production":"N/A","Website":"N/A","Response":"True"},'After':{"Title":"After","Year":"2019","Rated":"PG-13","Released":"12 Apr 2019","Runtime":"105 min","Genre":"Drama, Romance","Director":"Jenny Gage","Writer":"Tom Betterton (screenplay by), Tamara Chestna (screenplay by), Jenny Gage (screenplay by), Susan McMartin (screenplay by), Anna Todd (novel)","Actors":"Josephine Langford, Hero Fiennes Tiffin, Khadijha Red Thunder, Dylan Arnold","Plot":"A young woman falls for a guy with a dark secret and the two embark on a rocky relationship. Based on the novel by Anna Todd.","Language":"English","Country":"USA","Awards":"N/A","Poster":"https://m.media-amazon.com/images/M/MV5BOGUwMjk3YzktNDI0Yy00MzFiLWFjNmEtYTA2ODVjMzNhODhjXkEyXkFqcGdeQXVyOTQ1MDI4MzY@._V1_SX300.jpg","Ratings":[{"Source":"Internet Movie Database","Value":"5.5/10"},{"Source":"Rotten Tomatoes","Value":"16%"},{"Source":"Metacritic","Value":"30/100"}],"Metascore":"30","imdbRating":"5.5","imdbVotes":"13,596","imdbID":"tt4126476","Type":"movie","DVD":"09 Jul 2019","BoxOffice":"N/A","Production":"Aviron Pictures","Website":"https://www.after-themovie.com/","Response":"True"}}
+# movie_dict = {'Her Smell':{"Title":"Her Smell","Year":"2018","Rated":"R","Released":"10 May 2019","Runtime":"134 min","Genre":"Drama, Music","Director":"Alex Ross Perry","Writer":"Alex Ross Perry","Actors":"Elisabeth Moss, Angel Christian Roman, Cara Delevingne, Dan Stevens","Plot":"A self-destructive punk rocker struggles with sobriety while trying to recapture the creative inspiration that led her band to success.","Language":"English","Country":"USA, Greece","Awards":"N/A","Poster":"https://m.media-amazon.com/images/M/MV5BMTk2Mzg4NzI3NF5BMl5BanBnXkFtZTgwMzE5NDk1NzM@._V1_SX300.jpg","Ratings":[{"Source":"Internet Movie Database","Value":"6.2/10"},{"Source":"Rotten Tomatoes","Value":"84%"},{"Source":"Metacritic","Value":"69/100"}],"Metascore":"69","imdbRating":"6.2","imdbVotes":"1,219","imdbID":"tt7942742","Type":"movie","DVD":"N/A","BoxOffice":"N/A","Production":"Gunpowder &amp; Sky","Website":"https://www.hersmellmovie.com/","Response":"True"},'Gloria Bell':{"Title":"Gloria Bell","Year":"2018","Rated":"R","Released":"22 Mar 2019","Runtime":"102 min","Genre":"Comedy, Drama, Romance","Director":"Sebastián Lelio","Writer":"Alice Johnson Boher (adapted screenplay), Sebastián Lelio, Gonzalo Maza (story)","Actors":"Julianne Moore, John Turturro, Caren Pistorius, Michael Cera","Plot":"A free-spirited woman in her 50s seeks out love at L.A. dance clubs.","Language":"English","Country":"Chile, USA","Awards":"N/A","Poster":"https://m.media-amazon.com/images/M/MV5BMTc5Nzc1OTk3OV5BMl5BanBnXkFtZTgwNDM1NTQ3NjM@._V1_SX300.jpg","Ratings":[{"Source":"Internet Movie Database","Value":"6.4/10"},{"Source":"Metacritic","Value":"79/100"}],"Metascore":"79","imdbRating":"6.4","imdbVotes":"4,737","imdbID":"tt6902696","Type":"movie","DVD":"N/A","BoxOffice":"N/A","Production":"N/A","Website":"N/A","Response":"True"},'After':{"Title":"After","Year":"2019","Rated":"PG-13","Released":"12 Apr 2019","Runtime":"105 min","Genre":"Drama, Romance","Director":"Jenny Gage","Writer":"Tom Betterton (screenplay by), Tamara Chestna (screenplay by), Jenny Gage (screenplay by), Susan McMartin (screenplay by), Anna Todd (novel)","Actors":"Josephine Langford, Hero Fiennes Tiffin, Khadijha Red Thunder, Dylan Arnold","Plot":"A young woman falls for a guy with a dark secret and the two embark on a rocky relationship. Based on the novel by Anna Todd.","Language":"English","Country":"USA","Awards":"N/A","Poster":"https://m.media-amazon.com/images/M/MV5BOGUwMjk3YzktNDI0Yy00MzFiLWFjNmEtYTA2ODVjMzNhODhjXkEyXkFqcGdeQXVyOTQ1MDI4MzY@._V1_SX300.jpg","Ratings":[{"Source":"Internet Movie Database","Value":"5.5/10"},{"Source":"Rotten Tomatoes","Value":"16%"},{"Source":"Metacritic","Value":"30/100"}],"Metascore":"30","imdbRating":"5.5","imdbVotes":"13,596","imdbID":"tt4126476","Type":"movie","DVD":"09 Jul 2019","BoxOffice":"N/A","Production":"Aviron Pictures","Website":"https://www.after-themovie.com/","Response":"True"}}
 
 
 '''parse the user input'''
 
 
-while True:
+# while True:
+
+# TODO: remove
+simple = True
+
+if simple == True:
+    s = ''
+    for m in movie_dict.items():
+        s = s + f'\n\n==========================={m[0]}=============================\n'
+        for x in list(list(m)[1].items()):
+            s = s + f'{x[0]}\t{str(x[1])}\n'
+
+        with open('results.txt','w') as f:
+            f.write(s)
+
+
+
+
+else:
 
     command = input('\nEnter [movie] -[flag] and press enter.  Type "help" for more info.  Type "X" to exit.\n')
 
@@ -161,7 +254,7 @@ while True:
 
     if command.strip().lower() == 'x':
         print('Exiting...')
-        break
+        # break
 
     command = func_lib.parse_user_input(command)
 

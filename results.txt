@@ -1,0 +1,58 @@
+
+
+===========================Safety=============================Title	Safety
+Year	2020
+Rated	PG
+Released	11 Dec 2020
+Runtime	122 min
+Genre	Biography, Drama, Sport
+Director	Reginald Hudlin
+Writer	Randy McKinnon, Nick Santora
+Actors	Jay Reeves, Javien Jackson, Thaddeus J. Mixson, Corinne Foxx
+Plot	The story of Ray-Ray McElrathbey, a freshman football player for Clemson University, who secretly raised his younger brother on campus after his home life became too unsteady.
+Language	English
+Country	USA
+Awards	N/A
+Poster	https://m.media-amazon.com/images/M/MV5BYTQ1ODNlY2YtZTU5OS00NjcxLTkwOTgtN2QzNWViOWIzMDMzXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_SX300.jpg
+Ratings	[{'Source': 'Internet Movie Database', 'Value': '6.8/10'}, {'Source': 'Metacritic', 'Value': '55/100'}]
+Metascore	55
+imdbRating	6.8
+imdbVotes	2,070
+imdbID	tt10649016
+Type	movie
+DVD	N/A
+BoxOffice	N/A
+Production	N/A
+Website	N/A
+Response	True
+
+
+===========================Godmothered=============================Title	Godmothered
+Year	2020
+Rated	PG
+Released	04 Dec 2020
+Runtime	110 min
+Genre	Comedy, Drama, Family, Fantasy
+Director	Sharon Maguire
+Writer	Kari Granlund (screenplay by), Melissa K. Stack (screenplay by), Kari Granlund (story by)
+Actors	June Squibb, Jillian Bell, Sonia Manzano, Carlease Burke
+Plot	A young and unskilled fairy godmother ventures out on her own to prove her worth by tracking down a young girl whose request for help was ignored.
+Language	Latin, English
+Country	USA
+Awards	N/A
+Poster	https://m.media-amazon.com/images/M/MV5BZTdkYjM0ZTQtNTc5NS00YzcxLWI0OTMtNTVjNmRlMGE3MmUzXkEyXkFqcGdeQXVyNjMwMzc3MjE@._V1_SX300.jpg
+Ratings	[{'Source': 'Internet Movie Database', 'Value': '6.1/10'}, {'Source': 'Metacritic', 'Value': '49/100'}]
+Metascore	49
+imdbRating	6.1
+imdbVotes	7,727
+imdbID	tt11681250
+Type	movie
+DVD	N/A
+BoxOffice	N/A
+Production	N/A
+Website	N/A
+Response	True
+
+
+===========================Im Your Woman=============================Response	False
+Error	Movie not found!
